@@ -27,7 +27,7 @@
 using System;
 using System.Globalization;
 
-namespace TestSubjects
+namespace ExposedObject.TestSubjects
 {
 #pragma warning disable CA1708 // Identifiers should differ by more than case
     public class ClassWithHiddenMethods

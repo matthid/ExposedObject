@@ -1,8 +1,7 @@
 ﻿// Author:
 // Leszek Ciesielski (skolima@gmail.com)
-// Manuel Josupeit-Walter (info@josupeit.com)
 //
-// (C) 2013 Cognifide
+// (C) 2011 Cognifide
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,47 +23,21 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
-using ExposedObject;
-
-using Xunit;
-
-namespace Tests
+namespace ExposedObject.TestSubjects
 {
-    public class HiddenClassTest
+    class StaticClass
     {
-        [Fact]
-        public void FieldTest()
-        {
-            dynamic exposed = Exposed.New(Type.GetType("TestSubjects.HiddenClass, TestSubjects"));
-            string password = exposed.password;
-            Assert.Null(password);
+#pragma warning disable 414
+#pragma warning disable CA1823 // Avoid unused private fields
+        private static string testValue = "testValue";
+#pragma warning restore CA1823 // Avoid unused private fields
+#pragma warning restore 414
 
-            exposed.password = "TestValue";
-            password = exposed.password;
-            Assert.Equal("TestValue", password);
+        internal static decimal ConvertValue(int valueToConvert)
+        {
+            return Value = valueToConvert * 1.2m;
         }
 
-        [Fact]
-        public void MethodTest()
-        {
-            dynamic exposed = Exposed.New(Type.GetType("TestSubjects.HiddenClass, TestSubjects"));
-            string password = exposed.GeneratePassword(8);
-
-            Assert.Equal(password, exposed.Password);
-        }
-
-        [Fact]
-        public void PropertyTest()
-        {
-            dynamic exposed = Exposed.New(Type.GetType("TestSubjects.HiddenClass, TestSubjects"));
-            int count = exposed.Countz;
-            Assert.Equal(0, count);
-
-            exposed.Countz = 9;
-            count = exposed.Countz;
-            Assert.Equal(9, count);
-        }
+        protected static decimal Value { get; set; }
     }
 }

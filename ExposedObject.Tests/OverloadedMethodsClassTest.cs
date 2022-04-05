@@ -23,17 +23,29 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace TestSubjects
+using System;
+
+using ExposedObject;
+
+using Xunit;
+
+namespace ExposedObject.Tests
 {
-#pragma warning disable CA1812 // Class is never instantiated
-    class GenericMethodClass
-#pragma warning restore CA1812 // Class is never instantiated
+    public class OverloadedMethodsClassTest
     {
-#pragma warning disable CA1822 // Mark members as static
-        private string Mangle<T1, T2>(T1 man, T2 gle)
-#pragma warning restore CA1822 // Mark members as static
+        [Fact]
+        public void OverloadResolutionTest()
         {
-            return man.ToString() + gle;
+            dynamic exposed = Exposed.New(Type.GetType("ExposedObject.TestSubjects.OverloadedMethodsClass, ExposedObject.TestSubjects"));
+
+            string password = exposed.SuperMethod();
+            Assert.Equal("SuperMethod", password);
+
+            password = exposed.SuperMethod(3);
+            Assert.Equal("SuperMethod_int", password);
+
+            password = exposed.SuperMethod("string");
+            Assert.Equal("SuperMethod_string", password);
         }
     }
 }

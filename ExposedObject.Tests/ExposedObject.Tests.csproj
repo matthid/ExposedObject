@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExposedObject\ExposedObject.csproj" />
-    <ProjectReference Include="..\TestSubjects\TestSubjects.csproj" />
+    <ProjectReference Include="..\ExposedObject.TestSubjects\ExposedObject.TestSubjects.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />

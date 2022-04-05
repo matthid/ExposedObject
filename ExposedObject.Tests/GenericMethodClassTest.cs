@@ -23,35 +23,31 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace TestSubjects
+using System;
+
+using ExposedObject;
+
+using Xunit;
+
+namespace ExposedObject.Tests
 {
-#pragma warning disable CA1812 // Class is never instantiated
-    class OverloadedMethodsClass
-#pragma warning restore CA1812 // Class is never instantiated
+    public class GenericMethodClassTest
     {
-#pragma warning disable CA1822 // Mark members as static
-        public string SuperMethod()
-#pragma warning restore CA1822 // Mark members as static
+        [Fact(Skip = "Not working")]
+        public void MethodTest()
         {
-            return "SuperMethod";
+            dynamic exposed = Exposed.New(Type.GetType("ExposedObject.TestSubjects.GenericMethodClass, ExposedObject.TestSubjects"));
+            string password = exposed.Mangle<string, int>("test", 8);
+
+            Assert.Equal("test8", password);
         }
 
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable CA1801 // Review unused parameters
-        protected string SuperMethod(int var)
-#pragma warning restore CA1801 // Review unused parameters
-#pragma warning restore CA1822 // Mark members as static
+        [Fact(Skip = "Not working")]
+        public void MismatchedMethodTest()
         {
-            return "SuperMethod_int";
-        }
+            dynamic exposed = Exposed.New(Type.GetType("ExposedObject.TestSubjects.GenericMethodClass, ExposedObject.TestSubjects"));
 
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable CA1801 // Review unused parameters
-        private string SuperMethod(string value)
-#pragma warning restore CA1801 // Review unused parameters
-#pragma warning restore CA1822 // Mark members as static
-        {
-            return "SuperMethod_string";
+            Assert.Throws<ArgumentException>(() => exposed.Mangle<int, int>("test", 8));
         }
     }
 }

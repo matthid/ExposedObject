@@ -1,5 +1,5 @@
 ﻿// Author:
-// Manuel Josupeit-Walter (info@josupeit.com)
+// Leszek Ciesielski (skolima@gmail.com)
 //
 // (C) 2011 Cognifide
 //
@@ -23,46 +23,35 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using ExposedObject;
-using TestSubjects;
-using Xunit;
-
-namespace Tests
+namespace ExposedObject.TestSubjects
 {
-    public class ClassWithByRefParametersTest
+#pragma warning disable CA1812 // Class is never instantiated
+    class OverloadedMethodsClass
+#pragma warning restore CA1812 // Class is never instantiated
     {
-        [Fact]
-        public void PublicMethodTest()
+#pragma warning disable CA1822 // Mark members as static
+        public string SuperMethod()
+#pragma warning restore CA1822 // Mark members as static
         {
-            var exposed = Exposed.From(new ClassWithByRefParameters());
-
-            var param1 = 123;
-            string param2 = null;
-            var param3 = 2937842L;
-            byte param4 = 111;
-
-            int result = exposed.PublicMethod(param1, ref param2, ref param3, ref param4);
-
-            Assert.Equal(0, result);
-            Assert.Equal("2937842", param2);
-            Assert.Equal(123, param4);
+            return "SuperMethod";
         }
 
-        [Fact]
-        public void ProtectedMethodTest()
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable CA1801 // Review unused parameters
+        protected string SuperMethod(int var)
+#pragma warning restore CA1801 // Review unused parameters
+#pragma warning restore CA1822 // Mark members as static
         {
-            var exposed = Exposed.From(new ClassWithByRefParameters());
+            return "SuperMethod_int";
+        }
 
-            var param1 = 123;
-            string param2 = null;
-            var param3 = 2937842L;
-            byte param4 = 111;
-
-            int result = exposed.ProtectedMethod(param1, ref param2, ref param3, ref param4);
-
-            Assert.Equal(0, result);
-            Assert.Equal("2937842", param2);
-            Assert.Equal(123, param4);
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable CA1801 // Review unused parameters
+        private string SuperMethod(string value)
+#pragma warning restore CA1801 // Review unused parameters
+#pragma warning restore CA1822 // Mark members as static
+        {
+            return "SuperMethod_string";
         }
     }
 }

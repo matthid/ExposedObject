@@ -1,7 +1,8 @@
 ﻿// Author:
 // Leszek Ciesielski (skolima@gmail.com)
+// Manuel Josupeit-Walter (info@josupeit.com)
 //
-// (C) 2011 Cognifide
+// (C) 2013 Cognifide
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,31 +24,43 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
 using ExposedObject;
-
+using ExposedObject.TestSubjects;
 using Xunit;
 
-namespace Tests
+namespace ExposedObject.Tests
 {
-    public class GenericMethodClassTest
+    public class ClassWithInheritedPrivateMembersTest
     {
-        [Fact(Skip = "Not working")]
-        public void MethodTest()
+        [Fact]
+        public void PrivatePropertyTest()
         {
-            dynamic exposed = Exposed.New(Type.GetType("TestSubjects.GenericMethodClass, TestSubjects"));
-            string password = exposed.Mangle<string, int>("test", 8);
-
-            Assert.Equal("test8", password);
+            dynamic exposed = Exposed.From(new ClassWithInheritedPrivateMembers());
+            int count = exposed.Count;
+            Assert.Equal(0, count);
+            exposed.Count = 8;
+            count = exposed.Count;
+            Assert.Equal(8, count);
         }
 
-        [Fact(Skip = "Not working")]
-        public void MismatchedMethodTest()
+        [Fact]
+        public void PrivateMethodTest()
         {
-            dynamic exposed = Exposed.New(Type.GetType("TestSubjects.GenericMethodClass, TestSubjects"));
+            dynamic exposed = Exposed.From(new ClassWithInheritedPrivateMembers());
+            exposed.SetPassword("test pass");
+            string password = exposed.Password;
+            Assert.Equal("test pass", password);
+        }
 
-            Assert.Throws<ArgumentException>(() => exposed.Mangle<int, int>("test", 8));
+        [Fact]
+        public void PrivateFieldTest()
+        {
+            dynamic exposed = Exposed.From(new ClassWithInheritedPrivateMembers());
+            int count = exposed._count;
+            Assert.Equal(0, count);
+            exposed._count = 8;
+            count = exposed.Count;
+            Assert.Equal(8, count);
         }
     }
 }

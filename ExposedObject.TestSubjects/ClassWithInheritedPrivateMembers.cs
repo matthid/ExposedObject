@@ -24,43 +24,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using ExposedObject;
-using TestSubjects;
-using Xunit;
-
-namespace Tests
+namespace ExposedObject.TestSubjects
 {
-    public class ClassWithInheritedPrivateMembersTest
+    public class ClassWithInheritedPrivateMembers : ClassWithHiddenMethods
     {
-        [Fact]
-        public void PrivatePropertyTest()
-        {
-            dynamic exposed = Exposed.From(new ClassWithInheritedPrivateMembers());
-            int count = exposed.Count;
-            Assert.Equal(0, count);
-            exposed.Count = 8;
-            count = exposed.Count;
-            Assert.Equal(8, count);
-        }
-
-        [Fact]
-        public void PrivateMethodTest()
-        {
-            dynamic exposed = Exposed.From(new ClassWithInheritedPrivateMembers());
-            exposed.SetPassword("test pass");
-            string password = exposed.Password;
-            Assert.Equal("test pass", password);
-        }
-
-        [Fact]
-        public void PrivateFieldTest()
-        {
-            dynamic exposed = Exposed.From(new ClassWithInheritedPrivateMembers());
-            int count = exposed._count;
-            Assert.Equal(0, count);
-            exposed._count = 8;
-            count = exposed.Count;
-            Assert.Equal(8, count);
-        }
+         
     }
 }

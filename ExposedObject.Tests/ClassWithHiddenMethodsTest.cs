@@ -29,11 +29,11 @@ using System.Threading;
 
 using ExposedObject;
 
-using TestSubjects;
+using ExposedObject.TestSubjects;
 
 using Xunit;
 
-namespace Tests
+namespace ExposedObject.Tests
 {
     public class ClassWithHiddenMethodsTest
     {

@@ -1,7 +1,7 @@
 ﻿// Author:
 // Manuel Josupeit-Walter (info@josupeit.com)
 //
-// (C) 2013 Cognifide
+// (C) 2011 Cognifide
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,26 +23,46 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Globalization;
+using ExposedObject;
+using ExposedObject.TestSubjects;
+using Xunit;
 
-#pragma warning disable CA1822 // because we want to test instance methods
-
-namespace TestSubjects
+namespace ExposedObject.Tests
 {
-    public class ClassWithByRefParameters
+    public class ClassWithByRefParametersTest
     {
-        public int PublicMethod(int param1, out string param2, in long param3, ref byte param4)
+        [Fact]
+        public void PublicMethodTest()
         {
-            param2 = param3.ToString(CultureInfo.InvariantCulture);
-            param4 = unchecked((byte)param1);
-            return 0;
+            var exposed = Exposed.From(new ClassWithByRefParameters());
+
+            var param1 = 123;
+            string param2 = null;
+            var param3 = 2937842L;
+            byte param4 = 111;
+
+            int result = exposed.PublicMethod(param1, ref param2, ref param3, ref param4);
+
+            Assert.Equal(0, result);
+            Assert.Equal("2937842", param2);
+            Assert.Equal(123, param4);
         }
 
-        protected int ProtectedMethod(int param1, out string param2, in long param3, ref byte param4)
+        [Fact]
+        public void ProtectedMethodTest()
         {
-            param2 = param3.ToString(CultureInfo.InvariantCulture);
-            param4 = unchecked((byte)param1);
-            return 0;
+            var exposed = Exposed.From(new ClassWithByRefParameters());
+
+            var param1 = 123;
+            string param2 = null;
+            var param3 = 2937842L;
+            byte param4 = 111;
+
+            int result = exposed.ProtectedMethod(param1, ref param2, ref param3, ref param4);
+
+            Assert.Equal(0, result);
+            Assert.Equal("2937842", param2);
+            Assert.Equal(123, param4);
         }
     }
 }

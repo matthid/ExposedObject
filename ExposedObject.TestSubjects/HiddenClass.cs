@@ -1,8 +1,7 @@
 ﻿// Author:
 // Leszek Ciesielski (skolima@gmail.com)
-// Manuel Josupeit-Walter (info@josupeit.com)
 //
-// (C) 2013 Cognifide
+// (C) 2011 Cognifide
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -24,10 +23,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace TestSubjects
+namespace ExposedObject.TestSubjects
 {
-    public class ClassWithInheritedPrivateMembers : ClassWithHiddenMethods
+#pragma warning disable CA1812 // Class is never instantiated
+    class HiddenClass : ClassWithHiddenMethods
+#pragma warning restore CA1812 // Class is never instantiated
     {
-         
+        private int Countz { get; set; }
     }
 }

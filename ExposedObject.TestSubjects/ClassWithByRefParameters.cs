@@ -1,7 +1,7 @@
 ﻿// Author:
-// Leszek Ciesielski (skolima@gmail.com)
+// Manuel Josupeit-Walter (info@josupeit.com)
 //
-// (C) 2011 Cognifide
+// (C) 2013 Cognifide
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -23,44 +23,26 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
+using System.Globalization;
 
-using ExposedObject;
+#pragma warning disable CA1822 // because we want to test instance methods
 
-using Xunit;
-
-namespace Tests
+namespace ExposedObject.TestSubjects
 {
-    public class StaticClassTest
+    public class ClassWithByRefParameters
     {
-        [Fact]
-        public void FieldTest()
+        public int PublicMethod(int param1, out string param2, in long param3, ref byte param4)
         {
-            dynamic exposed = Exposed.From(Type.GetType("TestSubjects.StaticClass, TestSubjects"));
-            string testValue = exposed.testValue;
-            Assert.Equal("testValue", testValue);
-
-            exposed.testValue = "TestValue";
-            testValue = exposed.testValue;
-            Assert.Equal("TestValue", testValue);
+            param2 = param3.ToString(CultureInfo.InvariantCulture);
+            param4 = unchecked((byte)param1);
+            return 0;
         }
 
-        [Fact]
-        public void MethodTest()
+        protected int ProtectedMethod(int param1, out string param2, in long param3, ref byte param4)
         {
-            dynamic exposed = Exposed.From(Type.GetType("TestSubjects.StaticClass, TestSubjects"));
-            decimal convertValue = exposed.ConvertValue(8);
-
-            Assert.Equal(convertValue, exposed.Value);
-        }
-
-        [Fact]
-        public void PropertyTest()
-        {
-            dynamic exposed = Exposed.From(Type.GetType("TestSubjects.StaticClass, TestSubjects"));
-            exposed.Value = 9;
-            decimal count = exposed.Value;
-            Assert.Equal(9, count);
+            param2 = param3.ToString(CultureInfo.InvariantCulture);
+            param4 = unchecked((byte)param1);
+            return 0;
         }
     }
 }

@@ -1,7 +1,8 @@
 ﻿// Author:
 // Leszek Ciesielski (skolima@gmail.com)
+// Manuel Josupeit-Walter (info@josupeit.com)
 //
-// (C) 2011 Cognifide
+// (C) 2013 Cognifide
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -29,23 +30,41 @@ using ExposedObject;
 
 using Xunit;
 
-namespace Tests
+namespace ExposedObject.Tests
 {
-    public class OverloadedMethodsClassTest
+    public class HiddenClassTest
     {
         [Fact]
-        public void OverloadResolutionTest()
+        public void FieldTest()
         {
-            dynamic exposed = Exposed.New(Type.GetType("TestSubjects.OverloadedMethodsClass, TestSubjects"));
+            dynamic exposed = Exposed.New(Type.GetType("ExposedObject.TestSubjects.HiddenClass, ExposedObject.TestSubjects"));
+            string password = exposed.password;
+            Assert.Null(password);
 
-            string password = exposed.SuperMethod();
-            Assert.Equal("SuperMethod", password);
+            exposed.password = "TestValue";
+            password = exposed.password;
+            Assert.Equal("TestValue", password);
+        }
 
-            password = exposed.SuperMethod(3);
-            Assert.Equal("SuperMethod_int", password);
+        [Fact]
+        public void MethodTest()
+        {
+            dynamic exposed = Exposed.New(Type.GetType("ExposedObject.TestSubjects.HiddenClass, ExposedObject.TestSubjects"));
+            string password = exposed.GeneratePassword(8);
 
-            password = exposed.SuperMethod("string");
-            Assert.Equal("SuperMethod_string", password);
+            Assert.Equal(password, exposed.Password);
+        }
+
+        [Fact]
+        public void PropertyTest()
+        {
+            dynamic exposed = Exposed.New(Type.GetType("ExposedObject.TestSubjects.HiddenClass, ExposedObject.TestSubjects"));
+            int count = exposed.Countz;
+            Assert.Equal(0, count);
+
+            exposed.Countz = 9;
+            count = exposed.Countz;
+            Assert.Equal(9, count);
         }
     }
 }

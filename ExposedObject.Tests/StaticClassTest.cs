@@ -23,21 +23,44 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace TestSubjects
-{
-    class StaticClass
-    {
-#pragma warning disable 414
-#pragma warning disable CA1823 // Avoid unused private fields
-        private static string testValue = "testValue";
-#pragma warning restore CA1823 // Avoid unused private fields
-#pragma warning restore 414
+using System;
 
-        internal static decimal ConvertValue(int valueToConvert)
+using ExposedObject;
+
+using Xunit;
+
+namespace ExposedObject.Tests
+{
+    public class StaticClassTest
+    {
+        [Fact]
+        public void FieldTest()
         {
-            return Value = valueToConvert * 1.2m;
+            dynamic exposed = Exposed.From(Type.GetType("ExposedObject.TestSubjects.StaticClass, ExposedObject.TestSubjects"));
+            string testValue = exposed.testValue;
+            Assert.Equal("testValue", testValue);
+
+            exposed.testValue = "TestValue";
+            testValue = exposed.testValue;
+            Assert.Equal("TestValue", testValue);
         }
 
-        protected static decimal Value { get; set; }
+        [Fact]
+        public void MethodTest()
+        {
+            dynamic exposed = Exposed.From(Type.GetType("ExposedObject.TestSubjects.StaticClass, ExposedObject.TestSubjects"));
+            decimal convertValue = exposed.ConvertValue(8);
+
+            Assert.Equal(convertValue, exposed.Value);
+        }
+
+        [Fact]
+        public void PropertyTest()
+        {
+            dynamic exposed = Exposed.From(Type.GetType("ExposedObject.TestSubjects.StaticClass, ExposedObject.TestSubjects"));
+            exposed.Value = 9;
+            decimal count = exposed.Value;
+            Assert.Equal(9, count);
+        }
     }
 }
