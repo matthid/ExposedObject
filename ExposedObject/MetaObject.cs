@@ -42,6 +42,9 @@ namespace ExposedObject
         /// </summary>
         private readonly bool isStatic;
 
+        private Exposed ExposedInstance => (Exposed)Value!;
+        private Type SubjectType => ExposedInstance.SubjectType;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="MetaObject"/> class.
         /// </summary>
@@ -54,7 +57,7 @@ namespace ExposedObject
         /// <param name="staticBind">
         /// Should this MetaObject bind to <see langword="static"/> or instance methods and fields.
         /// </param>
-        public MetaObject(Expression expression, object value, bool staticBind) :
+        public MetaObject(Expression expression, Exposed value, bool staticBind) :
             base(expression, BindingRestrictions.Empty, value)
         {
             isStatic = staticBind;
@@ -78,7 +81,7 @@ namespace ExposedObject
         public override DynamicMetaObject BindInvokeMember(InvokeMemberBinder binder, DynamicMetaObject[] args)
         {
             var self = Expression;
-            var exposed = (Exposed)Value;
+            var exposed = ExposedInstance;
 
             var argTypes = new Type[args.Length];
             var argExps = new Expression[args.Length];
@@ -92,7 +95,7 @@ namespace ExposedObject
                     argTypes[i] = argTypes[i].MakeByRefType();
             }
 
-            var type = exposed.SubjectType;
+            var type = SubjectType;
             var declaringType = type;
 #if EXPOSED_NULLABLE
             MethodInfo? method;
@@ -110,16 +113,50 @@ namespace ExposedObject
                 throw new MissingMemberException(type.FullName, binder.Name);
             }
 
-            var @this = isStatic
-                            ? null
-                            : Expression.Convert(Expression.Field(Expression.Convert(self, typeof(Exposed)), "value"), type);
+            var thisRaw = GetThisExpressionRaw(self);
+            var @this = ConvertThis(thisRaw, type);
 
             var target = Expression.Call(@this, method, argExps);
             var restrictions = BindingRestrictions.GetTypeRestriction(self, typeof(Exposed));
+            restrictions = AppendRestrictions(thisRaw, restrictions, self);
 
             return new DynamicMetaObject(ConvertExpressionType(binder.ReturnType, target), restrictions);
         }
 
+        private BindingRestrictions AppendRestrictions(Expression? thisRaw, BindingRestrictions restrictions, Expression self)
+        {
+            if (thisRaw is { } thisExp)
+            {
+                restrictions = restrictions.Merge(BindingRestrictions.GetTypeRestriction(thisExp, SubjectType));
+            }
+            else
+            {
+                // Need to restrict the instance :(
+                restrictions = restrictions.Merge(BindingRestrictions.GetInstanceRestriction(self, ExposedInstance));
+            }
+
+            return restrictions;
+        }
+
+        private static Expression? ConvertThis(Expression? rawThis, Type type)
+        {
+            if (rawThis != null)
+            {
+                return Expression.Convert(rawThis, type);
+            }
+
+            return null;
+        }
+        
+        private Expression? GetThisExpressionRaw(Expression self)
+        {
+            return isStatic
+                ? null
+                : Expression.Property(Expression.Convert(self, typeof(Exposed)), nameof(Exposed.Value));
+        }
+
+        
+        
         /// <summary>
         /// Performs the binding of the dynamic get member operation.
         /// </summary>
@@ -133,13 +170,18 @@ namespace ExposedObject
         {
             var self = Expression;
 
-            var memberExpression = GetMemberExpression(self, binder.Name);
+            var type = SubjectType;
+            var thisRaw = GetThisExpressionRaw(self);
+            var @this = ConvertThis(thisRaw, type);
+            var memberExpression = GetMemberExpression(@this, binder.Name);
 
             var target = Expression.Convert(memberExpression, binder.ReturnType);
             var restrictions = BindingRestrictions.GetTypeRestriction(self, typeof(Exposed));
+            restrictions = AppendRestrictions(thisRaw, restrictions, self);
 
             return new DynamicMetaObject(target, restrictions);
         }
+
 
         /// <summary>
         /// Performs the binding of the dynamic set member operation.
@@ -157,13 +199,17 @@ namespace ExposedObject
         {
             var self = Expression;
 
-            var memberExpression = GetMemberExpression(self, binder.Name);
+            var type = SubjectType;
+            var thisRaw = GetThisExpressionRaw(self);
+            var @this = ConvertThis(thisRaw, type);
+            var memberExpression = GetMemberExpression(@this, binder.Name);
 
             var target =
                 Expression.Convert(
                     Expression.Assign(memberExpression, Expression.Convert(value.Expression, memberExpression.Type)),
                     binder.ReturnType);
             var restrictions = BindingRestrictions.GetTypeRestriction(self, typeof(Exposed));
+            restrictions = AppendRestrictions(thisRaw, restrictions, self);
 
             return new DynamicMetaObject(target, restrictions);
         }
@@ -171,7 +217,7 @@ namespace ExposedObject
         /// <summary>
         /// Generates the <see cref="Expression"/> for accessing a member by name.
         /// </summary>
-        /// <param name="self">
+        /// <param name="this">
         /// The <see cref="Expression"/> for accessing the <see cref="Exposed"/> instance.
         /// </param>
         /// <param name="memberName">
@@ -182,17 +228,14 @@ namespace ExposedObject
         /// </returns>
         /// <exception cref="MissingMemberException">
         /// </exception>
-        private MemberExpression GetMemberExpression(Expression self, string memberName)
+        private MemberExpression GetMemberExpression(Expression? @this, string memberName)
         {
 #if EXPOSED_NULLABLE
             MemberExpression? memberExpression = null;
 #else
             MemberExpression memberExpression = null;
 #endif
-            var type = ((Exposed)Value).SubjectType;
-            var @this = isStatic
-                            ? null
-                            : Expression.Convert(Expression.Field(Expression.Convert(self, typeof(Exposed)), "value"), type);
+            var type = SubjectType;
             var declaringType = type;
 
             do
