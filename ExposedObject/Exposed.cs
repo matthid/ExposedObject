@@ -75,7 +75,12 @@ namespace ExposedObject
         /// <summary>
         /// Gets the <see cref="Type"/> of the exposed object.
         /// </summary>
-        internal Type SubjectType { get; private set; }
+        public Type SubjectType { get; private set; }
+
+        /// <summary>
+        /// Gets the wrapped value.
+        /// </summary>
+        public object? Value => value;
 
         /// <summary>
         /// Creates a new wrapper for accessing members of subject.
